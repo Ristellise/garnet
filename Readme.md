@@ -30,7 +30,11 @@ or install it manually by:
 Figure it out yourself. Should be rather simple though:
 
 1. Set your fantia cookie, set the users you want to scrape.
-2. Rename the `Config.sample.yaml` to just `Config.yaml`. Remove the `.sample`  would do.
+2. Rename the `Config.sample.yaml` to just `Config.yaml`. Remove the `.sample` would do.
+3. Install required dependencies.
+4. Run `Indexer.py`
+5. Run `Downloader.py`
+6. See your results in `work-path` specified in the YAML config.
 
 ## Other notes
 
