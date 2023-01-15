@@ -6,7 +6,7 @@ import aiohttp, aiofiles
 import orjson, os
 import yaml
 
-cfg = pathlib.Path("Erossmann.yaml")
+cfg = pathlib.Path("Config.yaml")
 if cfg.exists():
     with open(cfg,encoding="utf-8") as f:
         e = yaml.safe_load(f)
