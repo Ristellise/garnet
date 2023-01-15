@@ -4,14 +4,14 @@
 
 ## What?
 
-Garnet is a simple and fast fantia.jp downloader.
+Garnet is a simple and fast pixiv fanbox.cc downloader.
 
 ## Why?
 
 The previous downloader had 2 glaring issues:
 
 - Uses requests. Although it's possible to do with threads, asyncio & aiohttp can achieve greater speeds.
-- The code looked overly complicated for a simple fantia.jp downloader.
+- The code looked overly complicated for a simple fanbox.cc downloader.
 
 The script is split into 2 parts. The `indexer.py` and `downloader.py`. For Indexing and Downloading.
 
@@ -29,7 +29,7 @@ or install it manually by:
 
 Figure it out yourself. Should be rather simple though:
 
-1. Set your fantia cookie, set the users you want to scrape.
+1. Set your fanbox.cc cookie, set the users you want to scrape.
 2. Rename the `Config.sample.yaml` to just `Config.yaml`. Remove the `.sample` would do.
 3. Install required dependencies.
 4. Run `Indexer.py`
