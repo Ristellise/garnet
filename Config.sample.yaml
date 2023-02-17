@@ -4,4 +4,5 @@ user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 users:
 - !PLACEHOLDER
 - !PLACEHOLDER
+- ~auto # For automatic grabbing of all currently supported creators
 work-path: workspace

@@ -76,12 +76,11 @@ async def main():
         tasks = []
         for post_id, post in indexes.items():
 
-            creator_path = (work_path / post["creator"])
+            creator_path:pathlib.Path = (work_path / post["creator"])
             if not creator_path.is_dir():
                 creator_path.mkdir(exist_ok=True,parents=True)
 
-
-            san = re.sub(r"[/\\?%*:|\"<>\x7F\x00-\x1F]", "-", post['title'])
+            san = re.sub(r"[/\\?%*:|\"<>\x7F\x00-\x1F]", "-", post['title']).rstrip(".").rstrip(" ")
             post_path = (creator_path / f"{post_id}-{san}")
             pp = len(post["file"]) > 0 or len(post["image"]) > 0
             #print(pp, post_path.is_dir())

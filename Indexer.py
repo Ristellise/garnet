@@ -98,6 +98,18 @@ async def main():
 
         running_set = set(list(indexes.keys()))
         
+        if users[0] == "~auto":
+            if len(users) != 1:
+                raise Exception("!auto must be only defined once.")
+            resp = await session.get(f"https://api.fanbox.cc/plan.listSupporting")
+            if resp.status != 200:
+                raise Exception(f"Unexpected error: {resp.status}")
+            j_data = await resp.json()
+            users.clear()
+            for creator in j_data["body"]:
+                print(f"[auto] Adding: {creator['creatorId']}")
+                users.append(creator['creatorId'])
+            
         
         posts = []
         sem = asyncio.Semaphore(5)
@@ -107,7 +119,7 @@ async def main():
                 task_done = False
                 while not task_done:
                     response = await session.get(page)
-                    print(list(response.cookies))
+                    #print(list(response.cookies))
                     if response.status != 200:
                         await asyncio.sleep(random.uniform(0, 1))
                     else:
@@ -138,13 +150,19 @@ async def main():
         async def grb(pp_id):
             async with sem:
                 await asyncio.sleep(random.uniform(0.5, 1))
-                r = await session.get(f"https://api.fanbox.cc/post.info?postId={pp_id}")
-                rj = await r.json()
-                
-                parsed = body2mark(rj.get('body'))
-                #print(parsed)
-                indexes[parsed["post_id"]] = parsed
-                print(f"Indexed post: {parsed['post_id']}")
+                while True:
+                    try:
+                        r = await session.get(f"https://api.fanbox.cc/post.info?postId={pp_id}")
+                        rj = await r.json()
+                        
+                        parsed = body2mark(rj.get('body'))
+                        #print(parsed)
+                        indexes[parsed["post_id"]] = parsed
+                        print(f"Indexed post: {parsed['post_id']}")
+                        break
+                    except aiohttp.ServerDisconnectedError:
+                        await asyncio.sleep(random.uniform(0.5, 1))
+                        continue
         tsks = [asyncio.create_task(grb(p_id)) for p_id in posts]
         await asyncio.gather(*tsks)
 

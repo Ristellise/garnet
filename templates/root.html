@@ -1,0 +1,52 @@
+<html lang="en"><!--suppress HtmlRequiredTitleElement -->
+<head>
+    <meta charset="UTF-8">
+
+    <title>Fanservice</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS (as per normal) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- And add the Bootstrap-Dark-plugin Variant CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-dark-5@1.1.3/dist/css/bootstrap-dark-plugin.min.css"
+          rel="stylesheet">
+
+
+</head>
+<body class="bootstrap-dark">
+
+<nav class="navbar navbar-expand-lg navbar-themed">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Fanservice</a>
+    </div>
+</nav>
+
+
+<br>
+<div class="container">
+    <div class="card" style="width: 100%;">
+        <div class="card-body">
+            <h2 class="card-title" style="text-align: center">Fanservice - A dumb Fanbox DLer File server.</h2>
+            <div class="card-text" style="text-align: center">
+                <ul class="list-group">
+                    {% for dir in dirs %}
+                        <li class="list-group-item"><a href="/author/{{ dir.name }}">{{ dir.name }}</a></li>
+                    {% endfor %}
+                </ul>
+                <p><i>This should only be accessed locally, if this is accessible on the internet, you should be concerned!</i></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.6.0/dist/umd/popper.min.js"
+        integrity="sha384-KsvD1yqQ1/1+IA7gi3P0tyJcT3vR+NdBTt13hSJ2lnve8agRGXTTyNaBYmCR/Nwi"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.min.js"
+        integrity="sha384-nsg8ua9HAw1y0W1btsyWgBklPnCUAFLuTMS2G72MMONqmOymq585AcH49TLBQObG"
+        crossorigin="anonymous"></script>
+
+<script></script>
+
+</body>
+</html>
