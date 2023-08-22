@@ -55,7 +55,7 @@ async def main():
 
         async def download_task(url,path:pathlib.Path):
             if path.exists():
-                print(f"{path.name} already exists. Skipping...")
+                # print(f"{path.name} already exists. Skipping...")
                 return
             async with sem:
                 while True:
@@ -69,6 +69,9 @@ async def main():
                                             await f.write(content)
                                             pbar.update(len(content))
                                         return
+                            elif response.status == 500:
+                                print(await response.text(), "For URL", url)
+                                return
                     except (aiohttp.ServerDisconnectedError, aiohttp.ClientConnectionError):
                         await asyncio.sleep(random.uniform(1, 5))
                         continue
@@ -104,7 +107,7 @@ async def main():
                 else:
                     itera = post["image"]
                 for img in itera:
-                    print(img)
+                    # print(img)
                     tasks.append(download_task(img["originalUrl"], post_path / f"{img['id']}.{img['extension']}"))
         await asyncio.gather(*tasks)
 
