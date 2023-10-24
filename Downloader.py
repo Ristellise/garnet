@@ -72,6 +72,9 @@ async def main():
                             elif response.status == 500:
                                 print(await response.text(), "For URL", url)
                                 return
+                            elif response.status == 403:
+                                print(response.status, "For URL", url)
+                                return
                     except (aiohttp.ServerDisconnectedError, aiohttp.ClientConnectionError):
                         await asyncio.sleep(random.uniform(1, 5))
                         continue

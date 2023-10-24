@@ -28,10 +28,12 @@ print("========== TOKEN ==========")
 print("Token for today is: ", token)
 print("========== TOKEN ==========")
 
-@app.route('/static_fs/<string:author>/<string:post>/<string:image>')
-async def static_fs(author, post, image):
+@app.route('/static_fs/<string:author>/<path:router>')
+async def static_fs(author, router):
+    
     if author in [i.name for i in dirs]:
-        img = fs / author / post / image
+        img = fs / author / router
+        #print(img)
         if img.exists():
             return await quart.send_file(img)
 
@@ -41,11 +43,21 @@ def construct_posts(author: pathlib.Path):
     author_posts = {}
     for post in author.iterdir():
         author_posts[post.name] = []
-        for file in post.iterdir():
-            if file.suffix.lower().endswith('jpg') or file.suffix.lower().endswith('png') or \
-                    file.suffix.lower().endswith('jpeg') or file.suffix.lower().endswith('gif'):
-                #print(file.relative_to(fs).as_posix())
-                author_posts[post.name].append(file.relative_to(fs).as_posix())
+        if post.stem.startswith("_"):
+            print("Detected loose folder.")
+            for folder in post.iterdir():
+                author_posts[folder.name] = []
+                for file in folder.iterdir():
+                    if file.suffix.lower().endswith('jpg') or file.suffix.lower().endswith('png') or \
+                        file.suffix.lower().endswith('jpeg') or file.suffix.lower().endswith('gif'):
+                        author_posts[folder.name].append(file.relative_to(fs).as_posix())
+        else:
+            if post.is_dir():
+                for file in post.iterdir():
+                    if file.suffix.lower().endswith('jpg') or file.suffix.lower().endswith('png') or \
+                            file.suffix.lower().endswith('jpeg') or file.suffix.lower().endswith('gif'):
+                        #print(file.relative_to(fs).as_posix())
+                        author_posts[post.name].append(file.relative_to(fs).as_posix())
     sorted = natsort.os_sorted(author_posts, reverse=True)
     a = {}
     for s_key in sorted:
@@ -93,4 +105,4 @@ async def root():
 
 
 if __name__ == '__main__':
-    app.run("0.0.0.0", port=80)
+    app.run("0.0.0.0", port=80, debug=False)
