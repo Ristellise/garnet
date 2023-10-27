@@ -94,24 +94,78 @@ async def main():
                 post_path.mkdir(exist_ok=True,parents=True)
             elif not pp and post_path.is_dir():
                 os.rmdir(post_path)
-            if post["file"]:
-                if isinstance(post["file"], dict):
-                    itera = post["file"].values()
-                else:
-                    itera = post["file"]
-
-                for file in itera:
-                    #print(file)
-                    tasks.append(download_task(file["url"], post_path / f"{file['id']}.{file['extension']}"))
-
-            if post["image"]:
-                if isinstance(post["image"], dict):
-                    itera = post["image"].values()
-                else:
-                    itera = post["image"]
-                for img in itera:
-                    # print(img)
-                    tasks.append(download_task(img["originalUrl"], post_path / f"{img['id']}.{img['extension']}"))
+            if not "blocks" in post:
+                raise DeprecationWarning("Non blocks index is no longer supported.")
+            if post["blocks"]:
+                # Use the blocks to determine order
+                for blk_idx, block in enumerate(post["blocks"]):
+                    if block["type"] == "image":
+                        image = None
+                        if isinstance(post["image"], list):
+                            for s_im in post["image"]:
+                                if s_im["id"] == block["imageId"]:
+                                    image = s_im
+                                    break
+                        else:
+                            # Probably dict
+                            image = post["image"][block["imageId"]]
+                        if image is None:
+                            print("Weird post",post)
+                            raise Exception()
+                        subname = image['id']
+                        if 'name' in image:
+                            subname = f"{image['name']}-{image['id']}"
+                        tasks.append(download_task(image["originalUrl"], post_path / f"blk-{blk_idx}-{subname}.{image['extension']}"))
+                    elif block["type"] == "file":
+                        file = post["file"][block["fileId"]]
+                        subname = file['id']
+                        if 'name' in file:
+                            subname = f"{file['name']}-{file['id']}"
+                        tasks.append(download_task(file["url"], post_path / f"blk-{blk_idx}-{subname}.{file['extension']}"))
+                        
+            else:
+                # Fall back to images first then files for order.
+                for img_idx, image in enumerate(post["image"]):
+                    subname = image['id']
+                    if "name" in image:
+                        subname = f"{image['name']}-{image['id']}"
+                    tasks.append(download_task(image["originalUrl"], post_path / f"im-{img_idx}-{subname}.{image['extension']}"))
+                for fs_idx, file in enumerate(post["file"]):
+                    subname = file['id']
+                    if 'name' in file:
+                        subname = f"{file['name']}-{file['id']}"
+                    tasks.append(download_task(file["url"], post_path / f"fs-{fs_idx}-{subname}.{file['extension']}"))
+                
+                # No blocks
+            # if post["file"]:
+            #     if isinstance(post["file"], dict):
+            #         itera = post["file"].values()
+            #     else:
+            #         itera = post["file"]
+            #     for file in itera:
+            #         #print(file)
+            #         if file["name"]:
+            #             # Use named file.
+            #             tasks.append(download_task(file["url"], post_path / f"{file['name']}.{file['extension']}"))
+            #         else:
+            #             # Use new blocks format
+            #             if "blocks" in post and post["blocks"]:
+            #                 img_idx = 0
+            #                 for idx, block in enumerate(post["blocks"]):
+            #                     if block["type"] == "image" and block["imageId"] == file['id']:
+            #                         img_idx = idx
+            #                         break
+            #                 tasks.append(download_task(file["url"], post_path / f"{img_idx}-{file['id']}.{file['extension']}"))
+            #             else:
+            #                 tasks.append(download_task(file["url"], post_path / f"{file['id']}.{file['extension']}"))
+            # if post["image"]:
+            #     if isinstance(post["image"], dict):
+            #         itera = post["image"].values()
+            #     else:
+            #         itera = post["image"]
+            #     for idx, img in enumerate(itera):
+            #         # print(img)
+            #         
         await asyncio.gather(*tasks)
 
 if __name__ == "__main__":

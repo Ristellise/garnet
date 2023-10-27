@@ -80,20 +80,26 @@ async def main():
 
     running_set = set(list(indexes.keys()))
 
-    if users[0] == "~auto":
-        if len(users) != 1:
-            raise Exception("!auto must be only defined once.")
-        resp = await async_session.get(f"https://api.fanbox.cc/plan.listSupporting")
-        if resp.status_code != 200:
-            raise Exception(f"Unexpected error: {resp.status_code}")
-        j_data = resp.json()
-        users.clear()
-        for creator in j_data["body"]:
-            print(f"[auto] Adding: {creator['creatorId']}")
-            users.append(creator["creatorId"])
+    auto_magic = "~auto"
+    selected_users = set()
+    for user in users:
+        if user == auto_magic:
+            resp = await async_session.get(f"https://api.fanbox.cc/plan.listSupporting")
+            if resp.status_code != 200:
+                raise Exception(f"Unexpected error: {resp.status_code}")
+            j_data = resp.json()
+            # users.clear()
+            for creator in j_data["body"]:
+                print(f"[auto] Adding: {creator['creatorId']}")
+                selected_users.add(creator["creatorId"])
+        else:
+            print(f"[Manual] Adding: {user}")
+            selected_users.add(user)
+    
+        
 
     posts = []
-    max_inflight = asyncio.Semaphore(5)
+    max_inflight = asyncio.Semaphore(10)
     pbar = tqdm.tqdm(total=0)
 
     async def page_task(page: str, creator_name):
@@ -127,7 +133,7 @@ async def main():
                 # 
                         
 
-    for creator in users:
+    for creator in selected_users:
         pages = await async_session.get(
             f"https://api.fanbox.cc/post.paginateCreator?creatorId={creator}"
         )
@@ -152,6 +158,9 @@ async def main():
                     print(f"Indexed post: {parsed['post_id']}")
                     break
                 except httpx.NetworkError:
+                    await asyncio.sleep(random.uniform(0.5, 1))
+                    continue
+                except httpx.ProtocolError:
                     await asyncio.sleep(random.uniform(0.5, 1))
                     continue
 
